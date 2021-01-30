@@ -7,6 +7,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.provider.Settings;
+import android.service.autofill.UserData;
 import android.util.Log;
 import android.util.SparseArray;
 import android.view.MenuItem;
@@ -293,6 +294,9 @@ public class YoutubeLibaray extends AppCompatActivity implements Player.EventLis
 
         Log.d(TAG, "youtubeThroughExoSteup: "+LocalData.CourseName+" "+LocalData.SubjectName+" "+LocalData.TopicName);
         Log.d(TAG, "youtubeThroughExoSteup: "+LocalData.CourseName+" "+LocalData.TopicName+" "+LocalData.SubjectName);
+
+        Log.d("TAG", "downloadFromUrl: "+SharedPrefManager.getInstance(this).refCode().getUsername()
+                +"  "+SharedPrefManager.getInstance(this).refCode().getUserId());
 
         playVideo(completeUrl);
 

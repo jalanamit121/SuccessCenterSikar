@@ -18,6 +18,7 @@ import android.widget.TextView;
 
 import com.winbee.successcentersikar.R;
 import com.winbee.successcentersikar.Utils.LocalData;
+import com.winbee.successcentersikar.Utils.SharedPrefManager;
 
 import java.io.File;
 import java.io.IOException;
@@ -170,13 +171,14 @@ public class DownloadVideo extends AppCompatActivity {
 
         request.setAllowedNetworkTypes(DownloadManager.Request.NETWORK_MOBILE | DownloadManager.Request.NETWORK_WIFI)
                 .setAllowedOverRoaming(true)
-                .setDestinationInExternalFilesDir(this,"Download/"+ LocalData.CourseName +"/"+LocalData.SubjectName, fileName);
+                .setDestinationInExternalFilesDir(this,"Download/"+ SharedPrefManager.getInstance(this).refCode().getUsername()+"/"+ LocalData.CourseName +"/"+LocalData.SubjectName, fileName);
 
 
 
         DownloadManager manager = (DownloadManager) getSystemService(Context.DOWNLOAD_SERVICE);
 
         return manager.enqueue(request);
+
 
 
 

@@ -12,6 +12,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.winbee.successcentersikar.R;
+import com.winbee.successcentersikar.Utils.LocalData;
+import com.winbee.successcentersikar.Utils.SharedPrefManager;
 import com.winbee.successcentersikar.adapter.AdapterCourse;
 
 import java.io.File;
@@ -37,7 +39,7 @@ public class ShowDownloadCourse extends AppCompatActivity implements AdapterCour
         String pathtem = Environment.getExternalStorageDirectory().getAbsolutePath()
                 + "/Android/data/"
                 + this.getBaseContext().getPackageName()
-                + "/files/Download";
+                + "/files/Download/"+ SharedPrefManager.getInstance(this).refCode().getUsername()+"/";
         File file = new File(pathtem);
         searchVid(file,"");
 
@@ -93,7 +95,8 @@ public class ShowDownloadCourse extends AppCompatActivity implements AdapterCour
             path = Environment.getExternalStorageDirectory().getAbsolutePath()
                     + "/Android/data/"
                     + this.getBaseContext().getPackageName()
-                    + "/files/Download/"+pathCourse.get(position).getName();
+                    + "/files/Download/"+SharedPrefManager.getInstance(this).refCode().getUsername()
+                    +"/"+pathCourse.get(position).getName();
 
                 File file = new File(path);
                 searchVid(file,"");
