@@ -2,11 +2,14 @@ package com.winbee.successcentersikar.activity;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
@@ -95,38 +98,65 @@ public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     UpdateManager mUpdateManager;
-    private String Username,UserID,android_id,UserMobile;
+    private String Username, UserID, android_id, UserMobile;
     private String UserPassword;
     private GifImageView image_gif;
     String Referal_code;
-    TextView txt_discount,user_name;
+    TextView txt_discount, user_name;
     TextView txtFlexibleUpdateProgress;
-    private ShimmerLayout shimmerLayout,shimmerLayout1,shimmerLayout2;
+    private ShimmerLayout shimmerLayout, shimmerLayout1, shimmerLayout2;
     ImageView img_share;
     private ProgressBarUtil progressBarUtil;
     private ArrayList<CourseContentArray> list1;
     private ArrayList<PdfSellArray> pdfSellArrays;
     ImageSlider img_video_thumbails;
-    private RecyclerView video_list_recycler,recycle_test_series,gec_home_recycle_pdf;
+    private RecyclerView video_list_recycler, recycle_test_series, gec_home_recycle_pdf;
     private AllCourseAdapter CourseAdapter;
     private AllPdfSellAdapter pdfSellAdapter;
-    ImageView WebsiteHome,img_noti;
+    ImageView WebsiteHome, img_noti;
     SwipeRefreshLayout refresh_main;
     boolean version = false;
-    LinearLayout layout_user,layout_test_series,layout_home,layout_doubt,layout_notification,
-            layout_course,layout_class,layout_test,layout_quiz;
-    String sCurrentVersion,sLastestVersion;
+    LinearLayout layout_user, layout_test_series, layout_home, layout_doubt, layout_notification,
+            layout_course, layout_class, layout_test, layout_quiz;
+    String sCurrentVersion, sLastestVersion;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        boolean connected = false;
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            //we are connected to a network
+            connected = true;
+        } else {
+            connected = false;
+        }
+
+
+        if (connected) {
+            doYourStuff();
+        }else {
+
+            startActivity(new Intent(this,OfflineDownloadActivity.class));
+            this.finish();
+        }
+
+
+
+
+    }
+
+    private void doYourStuff() {
+        Log.d("TAG", "onCreate: home");
         FacebookSdk.setAutoInitEnabled(true);
         txtFlexibleUpdateProgress = findViewById(R.id.txt_flexible_progress);
         FacebookSdk.fullyInitialize();
-       getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
-        Referal_code=SharedPrefManager.getInstance(this).refCode().getREFERRAL_CODE();
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+        Referal_code = SharedPrefManager.getInstance(this).refCode().getREFERRAL_CODE();
         try {
             PackageInfo info = getPackageManager().getPackageInfo(
                     "com.winbee.successcentersikar",
@@ -143,26 +173,25 @@ public class MainActivity extends AppCompatActivity
         }
 
 
-
         //firebase Common notification
-        if (Build.VERSION.SDK_INT>= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel("Common","Common", NotificationManager.IMPORTANCE_DEFAULT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("Common", "Common", NotificationManager.IMPORTANCE_DEFAULT);
 
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);
 
         }
         //firebase live class notification
-        if (Build.VERSION.SDK_INT>= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel("liveClass","liveClass", NotificationManager.IMPORTANCE_DEFAULT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("liveClass", "liveClass", NotificationManager.IMPORTANCE_DEFAULT);
 
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);
 
         }
         //firebase test series notification
-        if (Build.VERSION.SDK_INT>= Build.VERSION_CODES.O){
-            NotificationChannel channel = new NotificationChannel("testSeries","testSeries", NotificationManager.IMPORTANCE_DEFAULT);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel("testSeries", "testSeries", NotificationManager.IMPORTANCE_DEFAULT);
 
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);
@@ -180,35 +209,35 @@ public class MainActivity extends AppCompatActivity
                         //Toast.makeText(GecHomeActivity.this, msg, Toast.LENGTH_SHORT).show();
                     }
                 });
-        AppUpdateChecker appUpdateChecker=new AppUpdateChecker(this);  //pass the activity in constructure
+        AppUpdateChecker appUpdateChecker = new AppUpdateChecker(this);  //pass the activity in constructure
         appUpdateChecker.checkForUpdate(false); //mannual check false here
 
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        shimmerLayout1=findViewById(R.id.shimmerLayout1);
-        shimmerLayout=findViewById(R.id.shimmerLayout);
-        shimmerLayout2=findViewById(R.id.shimmerLayout2);
-        android_id = Settings.Secure.getString(getContext().getContentResolver(),Settings.Secure.ANDROID_ID);
+        shimmerLayout1 = findViewById(R.id.shimmerLayout1);
+        shimmerLayout = findViewById(R.id.shimmerLayout);
+        shimmerLayout2 = findViewById(R.id.shimmerLayout2);
+        android_id = Settings.Secure.getString(getContext().getContentResolver(), Settings.Secure.ANDROID_ID);
 
 
         txt_discount = findViewById(R.id.txt_discount);
         user_name = findViewById(R.id.user_name);
-        Username= SharedPrefManager.getInstance(this).refCode().getName();
-        UserID=SharedPrefManager.getInstance(this).refCode().getUserId();
-        user_name.setText("Hello"+" "+Username);
+        Username = SharedPrefManager.getInstance(this).refCode().getName();
+        UserID = SharedPrefManager.getInstance(this).refCode().getUserId();
+        user_name.setText("Hello" + " " + Username);
         img_video_thumbails = findViewById(R.id.img_video_thumbails);
         progressBarUtil = new ProgressBarUtil(this);
         video_list_recycler = findViewById(R.id.gec_home_recycle);
         recycle_test_series = findViewById(R.id.recycle_test_series);
         gec_home_recycle_pdf = findViewById(R.id.gec_home_recycle_pdf);
-        AllCourseAdapter allCourseAdapter = new AllCourseAdapter(this,list1);
-        video_list_recycler.setLayoutManager(new GridLayoutManager(this,1));
+        AllCourseAdapter allCourseAdapter = new AllCourseAdapter(this, list1);
+        video_list_recycler.setLayoutManager(new GridLayoutManager(this, 1));
         video_list_recycler.setAdapter(allCourseAdapter);
-        WebsiteHome=findViewById(R.id.WebsiteHome);
-        UserMobile=SharedPrefManager.getInstance(this).refCode().getUsername();
-        UserPassword=SharedPrefManager.getInstance(this).refCode().getPassword();
-        image_gif=findViewById(R.id.image_gif);
+        WebsiteHome = findViewById(R.id.WebsiteHome);
+        UserMobile = SharedPrefManager.getInstance(this).refCode().getUsername();
+        UserPassword = SharedPrefManager.getInstance(this).refCode().getPassword();
+        image_gif = findViewById(R.id.image_gif);
         image_gif.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -216,7 +245,7 @@ public class MainActivity extends AppCompatActivity
                 startActivity(live);
             }
         });
-        layout_user=findViewById(R.id.layout_user);
+        layout_user = findViewById(R.id.layout_user);
         layout_user.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -224,32 +253,32 @@ public class MainActivity extends AppCompatActivity
                 startActivity(profile);
             }
         });
-        img_noti=findViewById(R.id.img_noti);
+        img_noti = findViewById(R.id.img_noti);
         img_noti.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent profile = new Intent(MainActivity.this, NotificationActivity.class);
+                Intent profile = new Intent(MainActivity.this, ShowDownloadCourse.class);
                 startActivity(profile);
             }
         });
-        layout_test_series=findViewById(R.id.layout_test_series);
+        layout_test_series = findViewById(R.id.layout_test_series);
         layout_test_series.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent test = new Intent(MainActivity.this, SubjectActivity.class);
                 startActivity(test);
-               // Toast.makeText(MainActivity.this, "Coming Soon", Toast.LENGTH_SHORT).show();
+                // Toast.makeText(MainActivity.this, "Coming Soon", Toast.LENGTH_SHORT).show();
             }
         });
-        layout_home=findViewById(R.id.layout_home);
+        layout_home = findViewById(R.id.layout_home);
         layout_home.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent profile = new Intent(MainActivity.this,MainActivity.class);
+                Intent profile = new Intent(MainActivity.this, MainActivity.class);
                 startActivity(profile);
             }
         });
-        layout_doubt=findViewById(R.id.layout_doubt);
+        layout_doubt = findViewById(R.id.layout_doubt);
         layout_doubt.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -257,15 +286,15 @@ public class MainActivity extends AppCompatActivity
                 startActivity(profile);
             }
         });
-        layout_notification=findViewById(R.id.layout_notification);
+        layout_notification = findViewById(R.id.layout_notification);
         layout_notification.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent profile = new Intent(MainActivity.this,ReferalActivity.class);
+                Intent profile = new Intent(MainActivity.this, ReferalActivity.class);
                 startActivity(profile);
             }
         });
-        img_share=findViewById(R.id.img_share);
+        img_share = findViewById(R.id.img_share);
         img_share.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -273,45 +302,45 @@ public class MainActivity extends AppCompatActivity
                     Intent shareIntent = new Intent(Intent.ACTION_SEND);
                     shareIntent.setType("text/plain");
                     shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Success Center Sikar");
-                    String shareMessage= "\nSuccess Center Sikar download the application.\n ";
-                    String referalMessage= "\nMy Referal Code is .\n "+Referal_code;
-                    shareMessage = shareMessage + "\nhttps://play.google.com/store/apps/details?id="+getPackageName() ;
-                    shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage+referalMessage);
+                    String shareMessage = "\nSuccess Center Sikar download the application.\n ";
+                    String referalMessage = "\nMy Referal Code is .\n " + Referal_code;
+                    shareMessage = shareMessage + "\nhttps://play.google.com/store/apps/details?id=" + getPackageName();
+                    shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage + referalMessage);
                     startActivity(Intent.createChooser(shareIntent, "choose one"));
-                } catch(Exception e) {
+                } catch (Exception e) {
                 }
             }
         });
 
-        layout_course=findViewById(R.id.layout_course);
+        layout_course = findViewById(R.id.layout_course);
         layout_course.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent profile = new Intent(MainActivity.this,MyPurchasedCourseActivity.class);
+                Intent profile = new Intent(MainActivity.this, MyPurchasedCourseActivity.class);
                 startActivity(profile);
             }
         });
-        layout_class=findViewById(R.id.layout_class);
+        layout_class = findViewById(R.id.layout_class);
         layout_class.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent profile = new Intent(MainActivity.this,YouTubeVideoList.class);
+                Intent profile = new Intent(MainActivity.this, YouTubeVideoList.class);
                 startActivity(profile);
             }
         });
-        layout_test=findViewById(R.id.layout_test);
+        layout_test = findViewById(R.id.layout_test);
         layout_test.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent profile = new Intent(MainActivity.this,SubjectActivity.class);
+                Intent profile = new Intent(MainActivity.this, SubjectActivity.class);
                 startActivity(profile);
             }
         });
-        layout_quiz=findViewById(R.id.layout_quiz);
+        layout_quiz = findViewById(R.id.layout_quiz);
         layout_quiz.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent profile = new Intent(MainActivity.this,QuizActivity.class);
+                Intent profile = new Intent(MainActivity.this, QuizActivity.class);
                 startActivity(profile);
             }
         });
@@ -323,7 +352,7 @@ public class MainActivity extends AppCompatActivity
         callLiveClassService();
         callPdfService();
 
-        refresh_main=findViewById(R.id.refresh_main);
+        refresh_main = findViewById(R.id.refresh_main);
         refresh_main.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -338,29 +367,29 @@ public class MainActivity extends AppCompatActivity
                     public void run() {
                         refresh_main.setRefreshing(false);
                     }
-                },4000);
+                }, 4000);
             }
         });
         WebsiteHome.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-                    drawer.openDrawer(GravityCompat.START);
+                drawer.openDrawer(GravityCompat.START);
             }
         });
 
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-               this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-       drawer.addDrawerListener(toggle);
-       toggle.syncState();
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
 
-       NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-       navigationView.setNavigationItemSelectedListener(this);
-        View hView =  navigationView.getHeaderView(0);
-        TextView nav_user = (TextView)hView.findViewById(R.id.txt_user);
-        TextView nav_user_nuber = (TextView)hView.findViewById(R.id.txt_user_number);
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        View hView = navigationView.getHeaderView(0);
+        TextView nav_user = (TextView) hView.findViewById(R.id.txt_user);
+        TextView nav_user_nuber = (TextView) hView.findViewById(R.id.txt_user_number);
         nav_user.setText(SharedPrefManager.getInstance(this).refCode().getName());
         nav_user_nuber.setText(SharedPrefManager.getInstance(this).refCode().getUsername());
 
@@ -372,9 +401,8 @@ public class MainActivity extends AppCompatActivity
                 startActivity(intent);
             }
         });
-        Intent intent=getIntent();
-       Username=intent.getStringExtra("username");
-
+        Intent intent = getIntent();
+        Username = intent.getStringExtra("username");
     }
 
     @Override
@@ -394,14 +422,14 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
-            Intent home=new Intent(MainActivity.this,MainActivity.class);
+            Intent home = new Intent(MainActivity.this, MainActivity.class);
             startActivity(home);
         } else if (id == R.id.nav_profile) {
-            Intent profile = new Intent(MainActivity.this,DashboardCourseActivity.class);
+            Intent profile = new Intent(MainActivity.this, DashboardCourseActivity.class);
             startActivity(profile);
 
         } else if (id == R.id.nav_course) {
-            Intent course = new Intent(MainActivity.this,MyPurchasedCourseActivity.class);
+            Intent course = new Intent(MainActivity.this, MyPurchasedCourseActivity.class);
             startActivity(course);
         } else if (id == R.id.nav_test_series) {
             Intent test = new Intent(MainActivity.this, AllPurchasedTestActivity.class);
@@ -410,10 +438,10 @@ public class MainActivity extends AppCompatActivity
             Intent pdf = new Intent(MainActivity.this, AllPurchasedPdfActivity.class);
             startActivity(pdf);
         } else if (id == R.id.nav_txn) {
-            Intent txn = new Intent(MainActivity.this,MyTransactionActivity.class);
+            Intent txn = new Intent(MainActivity.this, MyTransactionActivity.class);
             startActivity(txn);
         } else if (id == R.id.nav_live_class) {
-            Intent live = new Intent(MainActivity.this,YouTubeVideoList.class);
+            Intent live = new Intent(MainActivity.this, YouTubeVideoList.class);
             startActivity(live);
 
         } else if (id == R.id.nav_about) {
@@ -423,7 +451,7 @@ public class MainActivity extends AppCompatActivity
             Intent intent = new Intent(MainActivity.this, ContactUsActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_rate) {
-            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" +getPackageName())));
+            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=" + getPackageName())));
 
         } else if (id == R.id.nav_referal) {
             Intent intent = new Intent(MainActivity.this, ReferalActivity.class);
@@ -434,12 +462,13 @@ public class MainActivity extends AppCompatActivity
                 Intent shareIntent = new Intent(Intent.ACTION_SEND);
                 shareIntent.setType("text/plain");
                 shareIntent.putExtra(Intent.EXTRA_SUBJECT, "Success Center Sikar");
-                String shareMessage= "\nSuccess Center Sikar download the application.\n ";
-                String referalMessage= "\nMy Referal Code is .\n "+Referal_code;
-                shareMessage = shareMessage + "\nhttps://play.google.com/store/apps/details?id="+getPackageName() ;
-                shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage+referalMessage);
+                String shareMessage = "\nSuccess Center Sikar download the application.\n ";
+                String referalMessage = "\nMy Referal Code is .\n " + Referal_code;
+                shareMessage = shareMessage + "\nhttps://play.google.com/store/apps/details?id=" + getPackageName();
+                shareIntent.putExtra(Intent.EXTRA_TEXT, shareMessage + referalMessage);
                 startActivity(Intent.createChooser(shareIntent, "choose one"));
-            } catch(Exception e) { }
+            } catch (Exception e) {
+            }
 
         } else if (id == R.id.nav_logout) {
             logout();
@@ -459,18 +488,18 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onResponse(Call<ArrayList<BannerModel>> call, Response<ArrayList<BannerModel>> response) {
                 int statusCode = response.code();
-                if (statusCode == 200 ) {
+                if (statusCode == 200) {
 //                    System.out.println("Suree body: " + response.body().getFile());
 //                    Picasso.get().load(response.body().getFile())
 //                            .placeholder(R.drawable.dummyimage)
 //                            .into(img_video_thumbails);
-                    ArrayList<BannerModel> bannerModel  =response.body();
-                    List<SlideModel> bannerModels=new ArrayList<>();
+                    ArrayList<BannerModel> bannerModel = response.body();
+                    List<SlideModel> bannerModels = new ArrayList<>();
                     //  bannerModels.add(new SlideModel(String.valueOf(Arrays.asList(bannerModel.getFile()))));
-                    for (int i=0;i<bannerModel.size();i++){
+                    for (int i = 0; i < bannerModel.size(); i++) {
                         bannerModels.add(new SlideModel(bannerModel.get(i).getFile()));
                     }
-                    img_video_thumbails.setImageList(bannerModels,false);
+                    img_video_thumbails.setImageList(bannerModels, false);
                     progressBarUtil.hideProgress();
                 } else {
                     progressBarUtil.hideProgress();
@@ -488,7 +517,7 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-// live class status
+    // live class status
     private void callLiveClassService() {
         progressBarUtil.showProgress();
         ClientApi apiCAll = ApiClient.getClient().create(ClientApi.class);
@@ -497,11 +526,11 @@ public class MainActivity extends AppCompatActivity
             @Override
             public void onResponse(Call<LiveStatus> call, Response<LiveStatus> response) {
                 int statusCode = response.code();
-                if (statusCode == 200 ) {
-                    if (response.body().getLivestatus()==true){
+                if (statusCode == 200) {
+                    if (response.body().getLivestatus() == true) {
                         image_gif.setVisibility(View.VISIBLE);
                         progressBarUtil.hideProgress();
-                    }else{
+                    } else {
                         image_gif.setVisibility(View.GONE);
                         progressBarUtil.hideProgress();
                     }
@@ -526,30 +555,30 @@ public class MainActivity extends AppCompatActivity
         progressBarUtil.showProgress();
         apiCallTest();
         ClientApi apiCAll = ApiClient.getClient().create(ClientApi.class);
-        Call<CourseContent> call = apiCAll.getBranchId(1,"WB_010","WB_010",UserID,android_id);
+        Call<CourseContent> call = apiCAll.getBranchId(1, "WB_010", "WB_010", UserID, android_id);
         call.enqueue(new Callback<CourseContent>() {
             @Override
             public void onResponse(Call<CourseContent> call, Response<CourseContent> response) {
                 apiCalledTest();
-                CourseContent courseContent=response.body();
+                CourseContent courseContent = response.body();
                 int statusCode = response.code();
                 list1 = new ArrayList();
-                if(statusCode==200){
-                    if (response.body().getError()== false) {
+                if (statusCode == 200) {
+                    if (response.body().getError() == false) {
                         System.out.println("Suree body: " + response.body());
                         list1 = new ArrayList<>(Arrays.asList(Objects.requireNonNull(courseContent).getData()));
                         CourseAdapter = new AllCourseAdapter(MainActivity.this, list1);
                         video_list_recycler.setAdapter(CourseAdapter);
                         progressBarUtil.hideProgress();
-                    }else{
+                    } else {
                         android.app.AlertDialog.Builder alertDialogBuilder =
                                 new android.app.AlertDialog.Builder(MainActivity.this);
                         alertDialogBuilder.setTitle("Alert");
                         alertDialogBuilder
                                 .setMessage(response.body().getError_Message())
                                 .setCancelable(false)
-                                .setPositiveButton("Ok",new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog,int id) {
+                                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
                                         forceLogout();
                                     }
                                 });
@@ -557,19 +586,18 @@ public class MainActivity extends AppCompatActivity
                         android.app.AlertDialog alertDialog = alertDialogBuilder.create();
                         alertDialog.show();
                     }
-                }
-                else{
+                } else {
                     progressBarUtil.hideProgress();
-                    System.out.println("Suree: response code"+response.message());
-                    Toast.makeText(getApplicationContext(),"NetWork Issue,Please Check Network Connection" ,Toast.LENGTH_SHORT).show();
+                    System.out.println("Suree: response code" + response.message());
+                    Toast.makeText(getApplicationContext(), "NetWork Issue,Please Check Network Connection", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<CourseContent> call, Throwable t) {
-                Toast.makeText(getApplicationContext(),"Failed" + t.getMessage(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Failed" + t.getMessage(), Toast.LENGTH_SHORT).show();
                 progressBarUtil.hideProgress();
-                System.out.println("Suree: Error "+t.getMessage());
+                System.out.println("Suree: Error " + t.getMessage());
             }
         });
     }
@@ -579,30 +607,30 @@ public class MainActivity extends AppCompatActivity
         progressBarUtil.showProgress();
         apiCallPdf();
         ClientApi apiCAll = ApiClient.getClient().create(ClientApi.class);
-        Call<PdfSell> call = apiCAll.fetchPdf("WB_010",UserID,android_id);
+        Call<PdfSell> call = apiCAll.fetchPdf("WB_010", UserID, android_id);
         call.enqueue(new Callback<PdfSell>() {
             @Override
             public void onResponse(Call<PdfSell> call, Response<PdfSell> response) {
                 apiCalledPdf();
-                PdfSell pdfSell=response.body();
+                PdfSell pdfSell = response.body();
                 int statusCode = response.code();
                 list1 = new ArrayList();
-                if(statusCode==200){
-                    if (response.body().getError()== false) {
+                if (statusCode == 200) {
+                    if (response.body().getError() == false) {
                         System.out.println("Suree body: " + response.body());
                         pdfSellArrays = new ArrayList<>(Arrays.asList(Objects.requireNonNull(pdfSell).getData()));
                         pdfSellAdapter = new AllPdfSellAdapter(MainActivity.this, pdfSellArrays);
                         gec_home_recycle_pdf.setAdapter(pdfSellAdapter);
                         progressBarUtil.hideProgress();
-                    }else{
+                    } else {
                         android.app.AlertDialog.Builder alertDialogBuilder =
                                 new android.app.AlertDialog.Builder(MainActivity.this);
                         alertDialogBuilder.setTitle("Alert");
                         alertDialogBuilder
                                 .setMessage(response.body().getError_Message())
                                 .setCancelable(false)
-                                .setPositiveButton("Ok",new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog,int id) {
+                                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
                                         forceLogout();
                                     }
                                 });
@@ -610,83 +638,80 @@ public class MainActivity extends AppCompatActivity
                         android.app.AlertDialog alertDialog = alertDialogBuilder.create();
                         alertDialog.show();
                     }
-                }
-                else{
+                } else {
                     progressBarUtil.hideProgress();
-                    System.out.println("Suree: response code"+response.message());
-                    Toast.makeText(getApplicationContext(),"NetWork Issue,Please Check Network Connection" ,Toast.LENGTH_SHORT).show();
+                    System.out.println("Suree: response code" + response.message());
+                    Toast.makeText(getApplicationContext(), "NetWork Issue,Please Check Network Connection", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onFailure(Call<PdfSell> call, Throwable t) {
-                Toast.makeText(getApplicationContext(),"Failed" + t.getMessage(),Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Failed" + t.getMessage(), Toast.LENGTH_SHORT).show();
                 progressBarUtil.hideProgress();
-                System.out.println("Suree: Error "+t.getMessage());
+                System.out.println("Suree: Error " + t.getMessage());
             }
         });
     }
+
     //for test series
     private void callTestApiService() {
         progressBarUtil.showProgress();
         apiCall();
-        ClientApi apiClient= OnlineTestApiClient.getClient().create(ClientApi.class);
-        Call<SectionDetailsMainModel> call=apiClient.fetchSectionDetails(OnlineTestData.org_code,OnlineTestData.auth_code,UserID);
+        ClientApi apiClient = OnlineTestApiClient.getClient().create(ClientApi.class);
+        Call<SectionDetailsMainModel> call = apiClient.fetchSectionDetails(OnlineTestData.org_code, OnlineTestData.auth_code, UserID);
         call.enqueue(new Callback<SectionDetailsMainModel>() {
             @Override
             public void onResponse(Call<SectionDetailsMainModel> call, Response<SectionDetailsMainModel> response) {
                 progressBarUtil.hideProgress();
                 apiCalled();
-                SectionDetailsMainModel sectionDetailsMainModel=response.body();
-                if(sectionDetailsMainModel!=null){
-                    if (sectionDetailsMainModel.getMessage().equalsIgnoreCase("TRUE")){
-                        List<SectionDetailsDataModel> sectionDetailsDataModelList=new ArrayList<>(Arrays.asList(sectionDetailsMainModel.getData()));
-                        AllPerminumTestAdapter allPerminumTestAdapter=new AllPerminumTestAdapter(MainActivity.this,sectionDetailsDataModelList);
+                SectionDetailsMainModel sectionDetailsMainModel = response.body();
+                if (sectionDetailsMainModel != null) {
+                    if (sectionDetailsMainModel.getMessage().equalsIgnoreCase("TRUE")) {
+                        List<SectionDetailsDataModel> sectionDetailsDataModelList = new ArrayList<>(Arrays.asList(sectionDetailsMainModel.getData()));
+                        AllPerminumTestAdapter allPerminumTestAdapter = new AllPerminumTestAdapter(MainActivity.this, sectionDetailsDataModelList);
                         recycle_test_series.setAdapter(allPerminumTestAdapter);
-                    }
-                    else
-                    {
+                    } else {
                         Toast.makeText(MainActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
                     }
-                }
-                else
+                } else
                     Toast.makeText(MainActivity.this, response.body().getMessage(), Toast.LENGTH_SHORT).show();
             }
+
             @Override
             public void onFailure(Call<SectionDetailsMainModel> call, Throwable t) {
                 Toast.makeText(MainActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
-                System.out.println("call fail "+t);
-               progressBarUtil.hideProgress();
+                System.out.println("call fail " + t);
+                progressBarUtil.hideProgress();
             }
         });
     }
-
 
 
     private void logout() {
 
         progressBarUtil.showProgress();
         ClientApi mService = ApiClient.getClient().create(ClientApi.class);
-        Call<LogOut> call = mService.refCodeLogout(3, UserMobile, UserPassword, "SCS001",android_id);
+        Call<LogOut> call = mService.refCodeLogout(3, UserMobile, UserPassword, "SCS001", android_id);
         call.enqueue(new Callback<LogOut>() {
             @Override
             public void onResponse(Call<LogOut> call, Response<LogOut> response) {
                 int statusCode = response.code();
-                if (statusCode == 200 && response.body().getLoginStatus()!=false) {
-                    if (response.body().getError()==false){
+                if (statusCode == 200 && response.body().getLoginStatus() != false) {
+                    if (response.body().getError() == false) {
                         progressBarUtil.hideProgress();
                         SharedPrefManager.getInstance(MainActivity.this).logout();
                         startActivity(new Intent(MainActivity.this, LoginActivity.class));
                         finish();
-                    }else{
+                    } else {
                         android.app.AlertDialog.Builder alertDialogBuilder = new android.app.AlertDialog.Builder(
                                 MainActivity.this);
                         alertDialogBuilder.setTitle("Alert");
                         alertDialogBuilder
                                 .setMessage(response.body().getError_Message())
                                 .setCancelable(false)
-                                .setPositiveButton("Ok",new DialogInterface.OnClickListener() {
-                                    public void onClick(DialogInterface dialog,int id) {
+                                .setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+                                    public void onClick(DialogInterface dialog, int id) {
                                         forceLogout();
                                     }
                                 });
@@ -711,14 +736,12 @@ public class MainActivity extends AppCompatActivity
             }
         });
     }
+
     private void forceLogout() {
         SharedPrefManager.getInstance(this).logout();
         startActivity(new Intent(this, LoginActivity.class));
         Objects.requireNonNull(this).finish();
     }
-
-
-
 
 
     // showing the update pop up to user
@@ -801,14 +824,17 @@ public class MainActivity extends AppCompatActivity
         shimmerLayout.setVisibility(View.VISIBLE);
         shimmerLayout.startShimmerAnimation();
     }
+
     private void apiCalled() {
         shimmerLayout.setVisibility(View.GONE);
         shimmerLayout.stopShimmerAnimation();
     }
+
     private void apiCallTest() {
         shimmerLayout1.setVisibility(View.VISIBLE);
         shimmerLayout1.startShimmerAnimation();
     }
+
     private void apiCalledTest() {
         shimmerLayout1.setVisibility(View.GONE);
         shimmerLayout1.stopShimmerAnimation();
@@ -818,11 +844,11 @@ public class MainActivity extends AppCompatActivity
         shimmerLayout2.setVisibility(View.VISIBLE);
         shimmerLayout2.startShimmerAnimation();
     }
+
     private void apiCalledPdf() {
         shimmerLayout2.setVisibility(View.GONE);
         shimmerLayout2.stopShimmerAnimation();
     }
-
 
 
 }

@@ -70,7 +70,7 @@
                     android:layout_marginRight="20dp"
                     android:layout_toLeftOf="@id/img_share"
                     android:layout_marginBottom="10dp"
-                    android:src="@drawable/ic_baseline_notifications_24"
+                    android:src="@drawable/ic_baseline_arrow_circle_down_24"
                     />
                 <ImageView
                     android:id="@+id/img_share"

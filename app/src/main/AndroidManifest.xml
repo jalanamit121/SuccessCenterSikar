@@ -16,8 +16,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true">
-        <activity android:name=".activity.ReferalActivity"
-            android:theme="@style/AppTheme.NoActionBar"  />
+        <activity android:name=".activity.OfflineDownloadActivity"/>
+        <activity android:name=".activity.DownloadVideo"
+            android:theme="@style/AppTheme.NoActionBar"/>
+        <activity android:name=".activity.ShowDownload"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
+        <activity android:name=".activity.ShowDownloadCourse"
+            android:theme="@style/AppTheme.NoActionBar"
+            />
+        <activity
+            android:name=".activity.ReferalActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.YoutubeLive"
             android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
@@ -71,7 +82,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activity.YoutubeLibaray"
-            android:configChanges="orientation|screenSize|smallestScreenSize|screenLayout|keyboardHidden"
+            android:configChanges="keyboardHidden|orientation|screenSize"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustUnspecified" />
         <activity

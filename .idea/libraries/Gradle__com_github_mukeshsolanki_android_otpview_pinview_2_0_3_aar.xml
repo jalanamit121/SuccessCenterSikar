@@ -10,6 +10,9 @@
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/c1883706db59a6b7e7405aa1ba64d735/jetified-android-otpview-pinview-2.0.3/AndroidManifest.xml" />
       <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/c1883706db59a6b7e7405aa1ba64d735/jetified-android-otpview-pinview-2.0.3/jars/classes.jar!/" />
       <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/c1883706db59a6b7e7405aa1ba64d735/jetified-android-otpview-pinview-2.0.3/res" />
+      <root url="jar://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/d6be35ed4c21f9026db33d7ccde9196c/jetified-android-otpview-pinview-2.0.3/jars/classes.jar!/" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/d6be35ed4c21f9026db33d7ccde9196c/jetified-android-otpview-pinview-2.0.3/AndroidManifest.xml" />
+      <root url="file://$USER_HOME$/.gradle/caches/transforms-2/files-2.1/d6be35ed4c21f9026db33d7ccde9196c/jetified-android-otpview-pinview-2.0.3/res" />
     </CLASSES>
     <JAVADOC />
     <SOURCES>
